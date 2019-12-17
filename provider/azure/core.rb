@@ -40,7 +40,7 @@ module Provider
       # Given a `config_dir` and return the `resource_dir` taking *package-xxx* subdirectory
       # into consideration.
       def get_resource_dir(config_dir)
-        return File.dirname(config_dir) if /^package-[\d-]+$/ =~ File.basename(config_dir)
+        return File.dirname(config_dir) if /^package-[\d-]+(-preview)?$/ =~ File.basename(config_dir)
 
         config_dir
       end
