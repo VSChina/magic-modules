@@ -143,7 +143,7 @@
 <%   if property.sensitive -%>
     Sensitive: true,
 <%   end -%>
-<%   unless property.default_value.nil? || !data_source_input.empty? -%>
+<%   unless property.output || property.default_value.nil? || !data_source_input.empty? -%>
 <%     if property.is_a?(Api::Type::Enum) -%>
     Default: <%= azure_go_literal((sdk_type.go_enum_const_prefix + property.default_value.to_s).to_sym, sdk_package) -%>,
 <%     elsif property.is_a?(Api::Azure::Type::BooleanEnum) -%>
