@@ -8,7 +8,7 @@
   output_properties = properties.select{|p| get_applicable_reference(p.azure_sdk_references, sdk_operation.request).nil?}
 -%>
 ---
-<%= lines(autogen_notice :yaml) -%>
+<%# lines(autogen_notice :yaml) -%>
 subcategory: ""
 layout: "azurerm"
 page_title: "Azure Resource Manager: azurerm_<%= resource_name -%>"
