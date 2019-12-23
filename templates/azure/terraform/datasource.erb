@@ -14,6 +14,9 @@ package azurerm
     flatten_queue = Array.new
     sdktype = Provider::Azure::Terraform::SDK::TypeDefinitionDescriptor.new sdk_operation, false
     sdk_marshal = Provider::Azure::Terraform::SDK::MarshalDescriptor.new sdk_package, resource_name, flatten_queue, sdktype, schema_properties
+
+    provider_name = object.api_name
+    provider_client_name = object.azure_sdk_definition.go_client
 -%>
 
 func dataSource<%= resource_name -%>() *schema.Resource {
@@ -31,8 +34,8 @@ func dataSource<%= resource_name -%>() *schema.Resource {
 }
 
 func dataSource<%= resource_name -%>Read(d *schema.ResourceData, meta interface{}) error {
-    client := meta.(*ArmClient).<%= lines(object.azure_sdk_definition.go_client) -%>
-    ctx, cancel := timeouts.ForRead(meta.(*ArmClient).StopContext, d)
+    client := meta.(*clients.Client).<%= provider_name -%>.<%= provider_client_name %>
+    ctx, cancel := timeouts.ForRead(meta.(*clients.Client).StopContext, d)
     defer cancel()
 
 <%  input_properties.sort_by{|p| [p.order, p.name]}.each do |prop| -%>
