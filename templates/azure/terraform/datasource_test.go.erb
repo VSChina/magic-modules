@@ -13,7 +13,6 @@ import (
 <%
     resource_name = object.name
     terraform_name = "azurerm_" + object.name.underscore
-    azure_client_name = object.azure_sdk_definition.go_client
 
     sdk_operation = object.azure_sdk_definition.read
     properties = object.all_user_properties
@@ -37,8 +36,8 @@ func TestAccDataSourceAzureRM<%= resource_name -%>_<%= test.name -%>(t *testing.
 <%      end -%>
 
     resource.ParallelTest(t, resource.TestCase{
-        PreCheck:     func() { testAccPreCheck(t) },
-        Providers:    testAccProviders,
+        PreCheck:     func() { acceptance.PreCheck(t) },
+        Providers:    acceptance.SupportedProviders,
         Steps: []resource.TestStep{
 <%      test.steps.each do |step| -%>
 <%        hcl_params = test_hcls[step][:random_vars].map(&:variable_name).uniq -%>

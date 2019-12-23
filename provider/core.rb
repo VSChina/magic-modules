@@ -101,7 +101,7 @@ module Provider
       # Files are often generated in parallel.
       # We can use thread-local variables to ensure that autogen checking
       # stays specific to the file each thred represents.
-      raise "#{path} missing autogen" unless Thread.current[:autogen]
+      raise "#{path} missing autogen" unless Thread.current[:autogen] unless $target_is_azure
 
       old_file_chmod_mode = File.stat(template).mode
       FileUtils.chmod(old_file_chmod_mode, path)

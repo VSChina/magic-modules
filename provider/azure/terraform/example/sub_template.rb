@@ -129,7 +129,7 @@ module Provider
             when :AccLocation
               @variable_name = @parameter_name = "location"
               @go_type = "string"
-              @create_expression = "testLocation()"
+              @create_expression = "acceptance.Location()"
               @format_string = "%s"
               @declare_order = 3
             end

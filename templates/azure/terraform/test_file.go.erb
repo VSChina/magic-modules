@@ -16,9 +16,10 @@ import (
 <%
     resource_name = "AzureRM" + object.name
     terraform_name = "azurerm_" + object.name.underscore
-    azure_client_name = object.azure_sdk_definition.go_client
     properties = object.all_user_properties
     contains_acctests = object.respond_to?(:acctests) && !object.acctests.nil? && !object.acctests.empty?
+    provider_name = object.api_name
+    provider_client_name = object.azure_sdk_definition.go_client
 -%>
 
 <%
@@ -37,8 +38,8 @@ func TestAcc<%= resource_name -%>_<%= test.name -%>(t *testing.T) {
 <%      end -%>
 
     resource.ParallelTest(t, resource.TestCase{
-        PreCheck:     func() { testAccPreCheck(t) },
-        Providers:    testAccProviders,
+        PreCheck:     func() { acceptance.PreCheck(t) },
+        Providers:    acceptance.SupportedProviders,
         CheckDestroy: testCheck<%= resource_name -%>Destroy,
         Steps: []resource.TestStep{
 <%      test.steps.each do |step| -%>
@@ -81,16 +82,16 @@ func testCheck<%= resource_name -%>Exists(resourceName string) resource.TestChec
 
 <%= lines(build_acctest_parameters_from_schema(object.azure_sdk_definition.read, properties)) -%>
 
-        client := testAccProvider.Meta().(*ArmClient).<%= azure_client_name -%>
+        client := acceptance.AzureProvider.Meta().(*clients.Client).<% provider_name -%>.<%= provider_client_name -%>
 
-        ctx := testAccProvider.Meta().(*ArmClient).StopContext
+        ctx := acceptance.AzureProvider.Meta().(*clients.Client).StopContext
 
         if resp, err := <%= build_sdk_func_invocation(object.azure_sdk_definition.read) -%>; err != nil {
             if utils.ResponseWasNotFound(resp.Response) {
                 return <%= build_errorf_with_resource_name("Bad: %s does not exist", false, object.azure_sdk_definition.delete, properties, object) -%>
 
             }
-            return fmt.Errorf("Bad: Get on <%= azure_client_name -%>: %+v", err)
+            return fmt.Errorf("Bad: Get on <%= provider_client_name -%>: %+v", err)
         }
 
         return nil
@@ -98,9 +99,9 @@ func testCheck<%= resource_name -%>Exists(resourceName string) resource.TestChec
 }
 
 func testCheck<%= resource_name -%>Destroy(s *terraform.State) error {
-    client := testAccProvider.Meta().(*ArmClient).<%= azure_client_name -%>
+    client := acceptance.AzureProvider.Meta().(*clients.Client).<% provider_name -%>.<%= provider_client_name -%>
 
-    ctx := testAccProvider.Meta().(*ArmClient).StopContext
+    ctx := acceptance.AzureProvider.Meta().(*clients.Client).StopContext
 
     for _, rs := range s.RootModule().Resources {
         if rs.Type != "<%= terraform_name -%>" {
@@ -111,7 +112,7 @@ func testCheck<%= resource_name -%>Destroy(s *terraform.State) error {
 
         if resp, err := <%= build_sdk_func_invocation(object.azure_sdk_definition.read) -%>; err != nil {
             if !utils.ResponseWasNotFound(resp.Response) {
-                return fmt.Errorf("Bad: Get on <%= azure_client_name -%>: %+v", err)
+                return fmt.Errorf("Bad: Get on <%= provider_client_name -%>: %+v", err)
             }
         }
 
