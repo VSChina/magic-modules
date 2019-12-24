@@ -57,11 +57,11 @@ module Provider
       end
 
       def azure_generate_resource(data)
-        dir = "azurerm"
-        target_folder = File.join(data.output_folder, dir)
+        rp_name = data.object.api_name.downcase
+        target_folder = File.join(data.output_folder, 'azurerm', 'internal', 'services', rp_name)
+        FileUtils.mkpath target_folder
 
         name = data.object.name.underscore
-        product_name = data.product.name.underscore
         filepath = File.join(target_folder, "resource_arm_#{name}.go")
 
         data.generate('templates/azure/terraform/resource.erb', filepath, self)
@@ -74,18 +74,17 @@ module Provider
         FileUtils.mkpath target_folder
 
         name = data.object.name.underscore
-        product_name = data.product.name.underscore
         filepath = File.join(target_folder, "#{name}.html.markdown")
 
         data.generate('templates/azure/terraform/resource.html.markdown.erb', filepath, self)
       end
 
       def azure_generate_resource_tests(data)
-        dir = "azurerm"
-        target_folder = File.join(data.output_folder, dir)
+        rp_name = data.object.api_name.downcase
+        target_folder = File.join(data.output_folder, 'azurerm', 'internal', 'services', rp_name, 'tests')
+        FileUtils.mkpath target_folder
 
         name = data.object.name.underscore
-        product_name = data.product.name.underscore
         filepath = File.join(target_folder, "resource_arm_#{name}_test.go")
 
         data.product = data.product.name
@@ -94,22 +93,22 @@ module Provider
       end
 
       def compile_datasource(data)
-        dir = 'azurerm'
-        target_folder = File.join(data.output_folder, dir)
-        FileUtils.mkpath target_folder
-
         name = data.object.name.underscore
-        product_name = data.product.name.underscore
+        rp_name = data.object.api_name.downcase
 
-        filepath = File.join(target_folder, "data_source_#{name}.go")
+        datasource_folder = File.join(data.output_folder, 'azurerm', 'internal', 'services', rp_name)
+        FileUtils.mkpath datasource_folder
+        filepath = File.join(datasource_folder, "data_source_#{name}.go")
         data.generate('templates/azure/terraform/datasource.erb', filepath, self)
 
-        filepath = File.join(target_folder, "data_source_#{name}_test.go")
+        datasource_test_folder = File.join(datasource_folder, 'tests')
+        FileUtils.mkpath datasource_test_folder
+        filepath = File.join(datasource_test_folder, "data_source_#{name}_test.go")
         data.generate('templates/azure/terraform/datasource_test.go.erb', filepath, self)
 
-        target_folder = File.join(data.output_folder, 'website', 'docs', 'd')
-        FileUtils.mkpath target_folder
-        filepath = File.join(target_folder, "#{name}.html.markdown")
+        datasource_doc_folder = File.join(data.output_folder, 'website', 'docs', 'd')
+        FileUtils.mkpath datasource_doc_folder
+        filepath = File.join(datasource_doc_folder, "#{name}.html.markdown")
         data.generate('templates/azure/terraform/datasource.html.markdown.erb', filepath, self)
       end
     end

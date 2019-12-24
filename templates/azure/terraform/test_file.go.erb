@@ -1,5 +1,4 @@
 <%# lines(autogen_notice :go) -%>
-
 package azurerm
 
 import (
@@ -82,7 +81,7 @@ func testCheck<%= resource_name -%>Exists(resourceName string) resource.TestChec
 
 <%= lines(build_acctest_parameters_from_schema(object.azure_sdk_definition.read, properties)) -%>
 
-        client := acceptance.AzureProvider.Meta().(*clients.Client).<% provider_name -%>.<%= provider_client_name -%>
+        client := acceptance.AzureProvider.Meta().(*clients.Client).<%= provider_name -%>.<%= provider_client_name -%>
 
         ctx := acceptance.AzureProvider.Meta().(*clients.Client).StopContext
 
@@ -99,7 +98,7 @@ func testCheck<%= resource_name -%>Exists(resourceName string) resource.TestChec
 }
 
 func testCheck<%= resource_name -%>Destroy(s *terraform.State) error {
-    client := acceptance.AzureProvider.Meta().(*clients.Client).<% provider_name -%>.<%= provider_client_name -%>
+    client := acceptance.AzureProvider.Meta().(*clients.Client).<%= provider_name -%>.<%= provider_client_name -%>
 
     ctx := acceptance.AzureProvider.Meta().(*clients.Client).StopContext
 
