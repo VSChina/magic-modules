@@ -109,7 +109,7 @@ module Provider
               @variable_name = "ri"
               @parameter_name = "rInt"
               @go_type = "int"
-              @create_expression = "tf.AccRandTimeInt()"
+              @create_expression = "data.RandomInteger"
               @format_string = "%d"
               @declare_order = 0
             when :AccStorageAccount
@@ -129,7 +129,7 @@ module Provider
             when :AccLocation
               @variable_name = @parameter_name = "location"
               @go_type = "string"
-              @create_expression = "acceptance.Location()"
+              @create_expression = "data.Locations.Primary"
               @format_string = "%s"
               @declare_order = 3
             end

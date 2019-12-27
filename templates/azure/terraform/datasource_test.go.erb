@@ -29,10 +29,7 @@ import (
         end
 -%>
 func TestAccDataSourceAzureRM<%= resource_name -%>_<%= test.name -%>(t *testing.T) {
-    dataSourceName := "data.<%= terraform_name -%>.test"
-<%      test.steps.map{|step| test_hcls[step][:random_vars]}.flatten.uniq(&:variable_name).each do |param| -%>
-    <%=   param.variable_name -%> := <%= lines(param.create_expression) -%>
-<%      end -%>
+    data := acceptance.BuildTestData(t, "<%= terraform_name -%>", "test")
 
     resource.ParallelTest(t, resource.TestCase{
         PreCheck:     func() { acceptance.PreCheck(t) },
@@ -42,13 +39,13 @@ func TestAccDataSourceAzureRM<%= resource_name -%>_<%= test.name -%>(t *testing.
 <%        hcl_params = test_hcls[step][:random_vars].map(&:variable_name).uniq -%>
 <%        props_to_check = get_example_properties_to_check(step, object) -%>
             {
-                Config: testAccDataSource<%= resource_name -%>_<%= step -%>(<%= hcl_params.join(", ") -%>),
+                Config: testAccDataSource<%= resource_name -%>_<%= step -%>(data),
                 Check: resource.ComposeTestCheckFunc(
 <%        props_to_check.each do |propName, propValue| -%>
 <%          if propValue == :AttrSet -%>
-                    resource.TestCheckResourceAttrSet(dataSourceName, "<%= propName -%>"),
+                    resource.TestCheckResourceAttrSet(data.ResourceName, "<%= propName -%>"),
 <%          else -%>
-                    resource.TestCheckResourceAttr(dataSourceName, "<%= propName -%>", "<%= propValue -%>"),
+                    resource.TestCheckResourceAttr(data.ResourceName, "<%= propName -%>", "<%= propValue -%>"),
 <%          end -%>
 <%        end -%>
                 ),
@@ -63,11 +60,9 @@ func TestAccDataSourceAzureRM<%= resource_name -%>_<%= test.name -%>(t *testing.
 <%
     if object.respond_to? :acctests
       test_hcls.each do |name, test_hcl|
-        uniq_params = test_hcl[:random_vars].uniq(&:parameter_name).map{|p| "#{p.parameter_name} #{p.go_type}"}
-        hcl_params = test_hcl[:random_vars].map(&:parameter_name).uniq
 -%>
-func testAccDataSource<%= resource_name -%>_<%= name -%>(<%= uniq_params.join(", ") -%>) string {
-    config := testAccAzureRM<%= resource_name -%>_<%= name -%>(<%= hcl_params.join(", ") -%>)
+func testAccDataSource<%= resource_name -%>_<%= name -%>(data acceptance.TestData) string {
+    config := testAccAzureRM<%= resource_name -%>_<%= name -%>(data)
     return fmt.Sprintf(`
 %s
 

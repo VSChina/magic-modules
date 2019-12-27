@@ -31,44 +31,32 @@ import (
         end
 -%>
 func TestAcc<%= resource_name -%>_<%= test.name -%>(t *testing.T) {
-    resourceName := "<%= terraform_name -%>.test"
-<%      test.steps.map{|step| test_hcls[step][:random_vars]}.flatten.uniq(&:variable_name).sort_by(&:declare_order).each do |param| -%>
-    <%=   param.variable_name -%> := <%= lines(param.create_expression) -%>
-<%      end -%>
-
+    data := acceptance.BuildTestData(t, "<%= terraform_name -%>", "test")
     resource.ParallelTest(t, resource.TestCase{
         PreCheck:     func() { acceptance.PreCheck(t) },
         Providers:    acceptance.SupportedProviders,
         CheckDestroy: testCheck<%= resource_name -%>Destroy,
         Steps: []resource.TestStep{
 <%      test.steps.each do |step| -%>
-<%        hcl_params = test_hcls[step][:random_vars].uniq(&:variable_name).sort_by(&:declare_order).map(&:variable_name) -%>
 <%        props_to_check = get_example_properties_to_check(step, object) -%>
             {
-                Config: testAcc<%= resource_name -%>_<%= step -%>(<%= hcl_params.join(", ") -%>),
+                Config: testAcc<%= resource_name -%>_<%= step -%>(data),
                 Check: resource.ComposeTestCheckFunc(
-                    testCheck<%= resource_name -%>Exists(resourceName),
+                    testCheck<%= resource_name -%>Exists(data.ResourceName),
 <%        props_to_check.each do |propName, propValue| -%>
 <%          if propValue == :AttrSet -%>
-                    resource.TestCheckResourceAttrSet(resourceName, "<%= propName -%>"),
+                    resource.TestCheckResourceAttrSet(data.ResourceName, "<%= propName -%>"),
 <%          else -%>
-                    resource.TestCheckResourceAttr(resourceName, "<%= propName -%>", "<%= propValue -%>"),
+                    resource.TestCheckResourceAttr(data.ResourceName, "<%= propName -%>", "<%= propValue -%>"),
 <%          end -%>
 <%        end -%>
                 ),
             },
 <%      end -%>
-<%      if test.steps.count == 1 -%>
-            {
-                ResourceName:      resourceName,
-                ImportState:       true,
-                ImportStateVerify: true,
-            },
-<%      end -%>
+            data.ImportStep(),
         },
     })
 }
-
 <%    end -%>
 <%  end -%>
 
@@ -126,10 +114,10 @@ func testCheck<%= resource_name -%>Destroy(s *terraform.State) error {
       test_hcls.each do |name, test_hcl|
         uniq_params = test_hcl[:random_vars].uniq(&:parameter_name).sort_by(&:declare_order).map{|p| "#{p.parameter_name} #{p.go_type}"}
 -%>
-func testAcc<%= resource_name -%>_<%= name -%>(<%= uniq_params.join(", ") -%>) string {
+func testAcc<%= resource_name -%>_<%= name -%>(data acceptance.TestData) string {
     return fmt.Sprintf(`
 <%=     lines(test_hcl[:hcl]) -%>
-`, <%=  test_hcl[:random_vars].map(&:parameter_name).join(", ") -%>)
+`, <%=  test_hcl[:random_vars].map(&:create_expression).join(", ") -%>)
 }
 
 <%
