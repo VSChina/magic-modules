@@ -56,6 +56,13 @@ func resource<%= resource_name -%>() *schema.Resource {
             State: schema.ImportStatePassthrough,
         },
 
+        Timeouts: &schema.ResourceTimeout{
+            Create: schema.DefaultTimeout(30 * time.Minute),
+            Read:   schema.DefaultTimeout(5 * time.Minute),
+            Update: schema.DefaultTimeout(30 * time.Minute),
+            Delete: schema.DefaultTimeout(30 * time.Minute),
+        },
+
 <%      unless object.async.nil? -%>
         Timeouts: &schema.ResourceTimeout {
             Create: schema.DefaultTimeout(<%= object.async.operation.timeouts.insert_sec -%> * time.Second),

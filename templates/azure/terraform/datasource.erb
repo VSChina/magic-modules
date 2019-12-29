@@ -21,6 +21,10 @@ func dataSource<%= resource_name -%>() *schema.Resource {
     return &schema.Resource{
         Read: dataSource<%= resource_name -%>Read,
 
+        Timeouts: &schema.ResourceTimeout{
+            Read: schema.DefaultTimeout(5 * time.Minute),
+        },
+
         Schema: map[string]*schema.Schema{<% # This block will remove the line-ending here -%>
 <%  order_azure_properties(schema_properties, input_properties).each do |prop| -%>
 <%=   lines_before(build_azure_schema_property(prop, object, 12, input_properties)) -%>
