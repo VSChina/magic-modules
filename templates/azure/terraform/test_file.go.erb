@@ -67,7 +67,7 @@ func testCheck<%= resource_name -%>Exists(resourceName string) resource.TestChec
             return fmt.Errorf("<%= object.name.titlecase -%> not found: %s", resourceName)
         }
 
-<%= lines(build_acctest_parameters_from_schema(object.azure_sdk_definition.read, properties)) -%>
+<%= lines(build_acctest_parameters_from_schema(object.azure_sdk_definition.read, properties, object)) -%>
 
         client := acceptance.AzureProvider.Meta().(*clients.Client).<%= provider_name -%>.<%= provider_client_name -%>
 
@@ -95,7 +95,7 @@ func testCheck<%= resource_name -%>Destroy(s *terraform.State) error {
             continue
         }
 
-<%= lines(build_acctest_parameters_from_schema(object.azure_sdk_definition.read, properties)) -%>
+<%= lines(build_acctest_parameters_from_schema(object.azure_sdk_definition.read, properties, object)) -%>
 
         if resp, err := <%= build_sdk_func_invocation(object.azure_sdk_definition.read) -%>; err != nil {
             if !utils.ResponseWasNotFound(resp.Response) {

@@ -34,6 +34,8 @@ package <%= provider_name.downcase -%>
     update_func_name_postfix = (combine_create_update ? "CreateUpdate" : "Update")
 -%>
 
+import azSchema "github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/tf/schema"
+
 func resource<%= resource_name -%>() *schema.Resource {
     return &schema.Resource{
         Create: resource<%= resource_name -%><%= create_func_name_postfix -%>,
@@ -52,9 +54,10 @@ func resource<%= resource_name -%>() *schema.Resource {
         ),
 <%      end -%>
 
-        Importer: &schema.ResourceImporter{
-            State: schema.ImportStatePassthrough,
-        },
+        Importer: &azSchema.ValidateResourceIDPriorToImport(func(id string) error {
+            _, err := parse.<%= object.name -%>ID(id)
+            return err
+        })
 
         Timeouts: &schema.ResourceTimeout{
             Create: schema.DefaultTimeout(30 * time.Minute),

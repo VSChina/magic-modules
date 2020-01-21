@@ -1,8 +1,8 @@
-id, err := azure.ParseAzureResourceID(d.Id())
+id, err := parse.<%=  object.name -%>ID(d.Id())
 if err != nil {
     return err
 }
 <%  sdk_op_def.request.reject {|k, v| v.id_portion.nil?}.each_value do |param| -%>
-<%=   param.go_variable_name -%> := id.<%= param.id_portion == "resourceGroups" ? "ResourceGroup" : "Path[\"#{param.id_portion}\"]" -%>
+<%=   param.go_variable_name -%> := id.<%= param.go_variable_name.capitalize-%>
 
 <%  end -%>
