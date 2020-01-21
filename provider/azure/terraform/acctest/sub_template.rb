@@ -22,9 +22,8 @@ module Provider
                              indentation: indentation,
                              sdk_op_def: sdk_op_def,
                              properties: properties,
-                             object: object,
+                             object: object
           end
-
         end
       end
     end
